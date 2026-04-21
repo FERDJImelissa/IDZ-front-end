@@ -1,20 +1,29 @@
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FileText, PlusCircle, Bell, User, LogOut } from 'lucide-react';
+import { FileText, PlusCircle, Bell, User, LogOut, Menu } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function CitoyenLayout({ children }) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const initials = `${user.prenom[0]}${user.nom ? user.nom[0] : ''}`;
 
   return (
-    <div className="min-h-screen flex flex-col bg-idz-alabaster">
+    <div className="min-h-screen flex flex-col bg-idz-alabaster overflow-hidden">
       {/* Top Header */}
       <header className="bg-idz-forest text-white flex items-center justify-between px-6 py-3 z-20 shadow-md">
         <div className="flex items-center gap-3">
-          <div className="bg-idz-action text-white font-bold font-heading text-sm w-9 h-9 flex items-center justify-center rounded-md">
+          <button 
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-1.5 hover:bg-white/10 rounded-md transition-colors text-white/90 hover:text-white"
+            title="Toggle Menu"
+          >
+            <Menu size={22} />
+          </button>
+          <div className="bg-idz-action text-white font-bold font-heading text-sm w-9 h-9 flex items-center justify-center rounded-md ml-1">
             IDZ
           </div>
           <div>
@@ -33,15 +42,20 @@ export default function CitoyenLayout({ children }) {
         </div>
       </header>
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-44 bg-idz-forest flex flex-col py-4 px-3 shrink-0">
-          <div className="mb-2">
-            <span className="flex items-center gap-1.5 text-xs text-green-400 font-semibold px-2 py-1">
-              <span className="w-2 h-2 rounded-full bg-green-400 inline-block animate-pulse"></span>
-              CONNECTÉ
-            </span>
-          </div>
+        <aside 
+          className={`bg-idz-forest flex flex-col shrink-0 transition-all duration-300 ease-in-out overflow-hidden ${
+            isSidebarOpen ? 'w-56' : 'w-0 opacity-0'
+          }`}
+        >
+          <div className="w-56 py-4 px-3 flex flex-col h-full min-h-0">
+            <div className="mb-2 shrink-0">
+              <span className="flex items-center gap-1.5 text-xs text-green-400 font-semibold px-2 py-1">
+                <span className="w-2 h-2 rounded-full bg-green-400 inline-block animate-pulse"></span>
+                CONNECTÉ
+              </span>
+            </div>
 
           <nav className="flex flex-col gap-1 flex-1 mt-3">
             <NavLink
@@ -74,13 +88,14 @@ export default function CitoyenLayout({ children }) {
             </NavLink>
           </nav>
 
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 px-4 py-3 text-red-400 hover:text-red-300 text-sm font-medium transition-colors"
-          >
-            <LogOut size={15} />
-            {t('nav.logout')}
-          </button>
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 px-4 py-3 text-red-400 hover:text-red-300 text-sm font-medium transition-colors shrink-0"
+            >
+              <LogOut size={15} />
+              {t('nav.logout')}
+            </button>
+          </div>
         </aside>
 
         {/* Main content */}
