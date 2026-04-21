@@ -22,9 +22,10 @@ export default function AgentLayout({ children }) {
           </div>
         </div>
         <div className="flex items-center gap-4 text-sm">
-          <span className="text-white/80">Agent: <span className="font-semibold text-white">{user.prenom}</span></span>
-          <span className="text-white/40">|</span>
-          <span className="text-white/80">APC Béjaïa</span>
+          <div className="text-right leading-tight">
+            <div className="font-semibold text-white">{user.prenom}</div>
+            <div className="text-[10px] text-white/60 font-medium uppercase tracking-wider">{user.commune || 'APC Béjaïa'}</div>
+          </div>
           <span className="text-white/40">|</span>
           <span className="bg-white/10 border border-white/20 rounded-md px-2 py-0.5 text-xs font-semibold">2FA ✓</span>
           <button

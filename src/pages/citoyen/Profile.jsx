@@ -1,8 +1,9 @@
 import CitoyenLayout from '../../components/CitoyenLayout';
-import { mockCitizen } from '../../data/mockData';
+import { useAuth } from '../../context/AuthContext';
 
 export default function CitoyenProfile() {
-  const initials = `${mockCitizen.prenom[0]}${mockCitizen.nom[0]}`;
+  const { user } = useAuth();
+  const initials = `${user.prenom[0]}${user.nom ? user.nom[0] : ''}`;
 
   return (
     <CitoyenLayout>
@@ -16,19 +17,19 @@ export default function CitoyenProfile() {
             {initials}
           </div>
           <div>
-            <p className="font-heading font-bold text-idz-soot text-base">{mockCitizen.nom} {mockCitizen.prenom}</p>
-            <p className="text-sm text-gray-400">{mockCitizen.commune}, Alger</p>
+            <p className="font-heading font-bold text-idz-soot text-base">{user.nom || ''} {user.prenom}</p>
+            <p className="text-sm text-gray-400">{user.commune}, Algérie</p>
           </div>
         </div>
 
         {/* Info card */}
         <div className="bg-gray-100 rounded-soft p-6 space-y-4">
           {[
-            { label: 'Nom complet',              value: `${mockCitizen.nom} ${mockCitizen.prenom}` },
-            { label: 'Date ET lieu de naissance', value: mockCitizen.dateNaissance },
-            { label: 'NIN',                       value: mockCitizen.nin, mono: true },
-            { label: 'Commune',                   value: `${mockCitizen.commune}, Alger` },
-            { label: 'Email',                     value: mockCitizen.email },
+            { label: 'Nom complet',              value: `${user.nom || ''} ${user.prenom}` },
+            { label: 'Date de naissance',        value: user.dateNaissance },
+            { label: 'Lieu de naissance',        value: user.lieuNaissance },
+            { label: 'NIN',                       value: '123456789123456789', mono: true },
+            { label: 'Commune de résidence',      value: user.commune },
           ].map(({ label, value, mono }) => (
             <div key={label} className="flex items-start gap-4">
               <span className="text-sm text-gray-400 w-48 shrink-0">{label}</span>

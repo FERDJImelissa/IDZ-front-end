@@ -16,17 +16,40 @@ export default function CitoyenLogin() {
   // Login form state
   const [loginForm, setLoginForm] = useState({ prenom: '', nin: '', password: '' });
   // Register form state
-  const [regForm, setRegForm] = useState({ prenom: '', nom: '', nin: '', password: '', telephone: '', email: '' });
+  const [regForm, setRegForm] = useState({ 
+    prenom: '', 
+    nom: '', 
+    nin: '', 
+    password: '', 
+    telephone: '', 
+    email: '',
+    commune: '',
+    dateNaissance: '',
+    lieuNaissance: ''
+  });
 
   const handleLogin = (e) => {
     e.preventDefault();
-    login({ prenom: loginForm.prenom, type: 'citoyen' });
+    login({ 
+        prenom: loginForm.prenom, 
+        type: 'citoyen',
+        commune: 'Alger-Centre', // Fallback for demo
+        dateNaissance: '15/06/1992',
+        lieuNaissance: 'Alger'
+    });
     navigate('/citoyen/dashboard');
   };
 
   const handleRegister = (e) => {
     e.preventDefault();
-    login({ prenom: regForm.prenom, nom: regForm.nom, type: 'citoyen' });
+    login({ 
+        prenom: regForm.prenom, 
+        nom: regForm.nom, 
+        type: 'citoyen',
+        commune: regForm.commune,
+        dateNaissance: regForm.dateNaissance,
+        lieuNaissance: regForm.lieuNaissance
+    });
     navigate('/citoyen/dashboard');
   };
 
@@ -140,6 +163,23 @@ export default function CitoyenLogin() {
                 </div>
               </div>
               <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Votre Commune</label>
+                <input type="text" placeholder="Ex: Hussein Dey" className="input-field" required
+                  value={regForm.commune} onChange={e => setRegForm({...regForm, commune: e.target.value})} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Date de naissance</label>
+                  <input type="date" className="input-field" required
+                    value={regForm.dateNaissance} onChange={e => setRegForm({...regForm, dateNaissance: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Lieu de naissance</label>
+                  <input type="text" placeholder="Ex: Alger" className="input-field" required
+                    value={regForm.lieuNaissance} onChange={e => setRegForm({...regForm, lieuNaissance: e.target.value})} />
+                </div>
+              </div>
+              <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">NIN (18 chiffres)</label>
                 <input type="text" placeholder="123456789123456789" maxLength={18} className="input-field font-mono" required
                   value={regForm.nin} onChange={e => setRegForm({...regForm, nin: e.target.value})} />
@@ -151,7 +191,7 @@ export default function CitoyenLogin() {
                     value={regForm.password} onChange={e => setRegForm({...regForm, password: e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Numéro de téléphone</label>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Téléphone</label>
                   <input type="tel" placeholder="05XXXXXXXX" className="input-field" required
                     value={regForm.telephone} onChange={e => setRegForm({...regForm, telephone: e.target.value})} />
                 </div>
@@ -162,7 +202,7 @@ export default function CitoyenLogin() {
                   value={regForm.email} onChange={e => setRegForm({...regForm, email: e.target.value})} />
               </div>
               <button type="submit" className="btn-primary w-full mt-1 flex items-center justify-center gap-2">
-                Confirmer →
+                Confirmer l'inscription →
               </button>
             </form>
           )}

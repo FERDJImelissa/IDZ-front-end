@@ -5,7 +5,14 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('idz_user');
-    return saved ? JSON.parse(saved) : { prenom: 'Citoyen', nom: 'DZ', type: 'citoyen' };
+    return saved ? JSON.parse(saved) : { 
+      prenom: 'Citoyen', 
+      nom: 'DZ', 
+      type: 'citoyen',
+      commune: 'Alger-Centre',
+      dateNaissance: '01/01/1990',
+      lieuNaissance: 'Alger'
+    };
   });
 
   const login = (userData) => {

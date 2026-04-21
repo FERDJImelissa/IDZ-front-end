@@ -25,7 +25,7 @@ export default function CitoyenLayout({ children }) {
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">
             <div className="text-sm font-semibold">{user.prenom} {user.nom || ''}</div>
-            <div className="text-xs text-white/60">Alger</div>
+            <div className="text-xs text-white/60">Commune d'{user.commune || 'Alger'}</div>
           </div>
           <div className="w-9 h-9 bg-idz-action rounded-full flex items-center justify-center text-white font-bold text-sm font-heading">
             {initials}

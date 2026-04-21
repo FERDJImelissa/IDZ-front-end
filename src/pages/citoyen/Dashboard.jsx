@@ -27,8 +27,9 @@ export default function CitoyenDashboard() {
             Bonjour, {user.prenom} 👋
           </h1>
           <p className="text-sm text-gray-400 mt-1">
-            Tableau de bord · {dateLabel}
+            Tableau de bord · Commune d'{user.commune} · Né(e) le {user.dateNaissance} à {user.lieuNaissance}
           </p>
+          <p className="text-[10px] text-gray-400 mt-0.5">{dateLabel}</p>
         </div>
 
         {/* New request CTA */}

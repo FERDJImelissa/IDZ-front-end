@@ -21,7 +21,11 @@ export default function AgentLogin() {
   const handleVerify = (e) => {
     e.preventDefault();
     const prenom = formData.email.split('@')[0];
-    login({ prenom: prenom.charAt(0).toUpperCase() + prenom.slice(1), type: 'agent' });
+    login({ 
+        prenom: prenom.charAt(0).toUpperCase() + prenom.slice(1), 
+        type: 'agent',
+        commune: 'APC Béjaïa-Centre' 
+    });
     navigate('/agent/dashboard');
   };
 
