@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import agentBg from '../../assets/agent_bg.jpg';
-import { ShieldCheck, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
 
 const AGENT_BG = agentBg;
 
@@ -12,21 +13,42 @@ export default function AgentLogin() {
   const { login } = useAuth();
   const [step, setStep] = useState(1); // 1: Credentials, 2: 2FA
   const [formData, setFormData] = useState({ email: '', password: '', code: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleNext = (e) => {
+  const handleNext = async (e) => {
     e.preventDefault();
-    setStep(2);
+    setError('');
+    setLoading(true);
+    try {
+      // Preliminary check: see if agent exists
+      const agent = await api.loginAgent(formData.email, formData.password);
+      // If OK, go to 2FA step (simulation)
+      setStep(2);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleVerify = (e) => {
+  const handleVerify = async (e) => {
     e.preventDefault();
-    const prenom = formData.email.split('@')[0];
-    login({ 
-        prenom: prenom.charAt(0).toUpperCase() + prenom.slice(1), 
-        type: 'agent',
-        commune: 'APC Béjaïa-Centre' 
-    });
-    navigate('/agent/dashboard');
+    setError('');
+    setLoading(true);
+    try {
+      // Re-login to get data and verify 2FA (simulated code 1234)
+      if (formData.code !== '1234') {
+        throw new Error("Code 2FA incorrect (utilisez 1234 for demo)");
+      }
+      const agent = await api.loginAgent(formData.email, formData.password);
+      login({ ...agent, type: 'agent' });
+      navigate('/agent/dashboard');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,6 +73,13 @@ export default function AgentLogin() {
             <p className="text-xs text-gray-400 text-center mb-6">
               Connexion sécurisée - Authentification 2FA
             </p>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-md flex items-start gap-2 text-red-600 text-[10px]">
+                <AlertCircle size={14} className="shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
 
             {/* Progress indicator */}
             <div className="flex items-center justify-center gap-4 mb-8">

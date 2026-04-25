@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CitoyenLayout from '../../components/CitoyenLayout';
-import { documentTypes, mockCitizen } from '../../data/mockData';
+import { documentTypes } from '../../data/mockData';
+import { api } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import { CheckCircle, Upload, CreditCard, Smartphone, ArrowLeft, Check } from 'lucide-react';
 
 const STEPS = ['1- Nouveau document', '2- Justificatifs', '3- Paiement', '4- Confirmation'];
@@ -24,12 +26,22 @@ function StepBar({ current }) {
 }
 
 export default function NewRequest() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState(null);
-  const [demRef] = useState(`DEM-${new Date().getFullYear()}-${String(Math.floor(Math.random()*900)+100).padStart(3,'0')}`);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [demRef, setDemRef] = useState('');
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/citoyen/login');
+    }
+  }, [user, navigate]);
+
+  if (!user) return null;
 
   // Step 1 — Document selection
   const Step1 = () => (
@@ -87,10 +99,10 @@ export default function NewRequest() {
       <div className="bg-gray-50 border border-gray-200 rounded-soft p-5 mb-5">
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Données pré-remplies via NIN</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div><span className="text-gray-400 block text-xs">Nom complet</span><span className="font-semibold text-idz-soot">{mockCitizen.nom} {mockCitizen.prenom}</span></div>
-          <div><span className="text-gray-400 block text-xs">NIN</span><span className="font-mono font-semibold text-idz-action text-xs">{mockCitizen.nin}</span></div>
-          <div><span className="text-gray-400 block text-xs">Date de naissance</span><span className="font-semibold text-idz-soot">{mockCitizen.dateNaissance}</span></div>
-          <div><span className="text-gray-400 block text-xs">Commune</span><span className="font-semibold text-idz-soot">{mockCitizen.commune}, Alger</span></div>
+          <div><span className="text-gray-400 block text-xs">Nom complet</span><span className="font-semibold text-idz-soot">{user.nom} {user.prenom}</span></div>
+          <div><span className="text-gray-400 block text-xs">NIN</span><span className="font-mono font-semibold text-idz-action text-xs">{user.nin}</span></div>
+          <div><span className="text-gray-400 block text-xs">Wilaya</span><span className="font-semibold text-idz-soot">{user.wilaya}</span></div>
+          <div><span className="text-gray-400 block text-xs">Commune</span><span className="font-semibold text-idz-soot">{user.commune}</span></div>
         </div>
       </div>
 
@@ -173,18 +185,31 @@ export default function NewRequest() {
 
         <div className="flex justify-end">
           <button
-            onClick={() => {
-              // Simulate payment redirect then go to confirmation
+            onClick={async () => {
               if (paymentMethod) {
-                alert(`Redirection vers ${paymentMethod === 'cib' ? 'CIB/SATIM' : 'BaridiMob'} en cours...`);
-                setTimeout(() => setStep(3), 500);
+                setIsSubmitting(true);
+                try {
+                  const res = await api.createRequest({
+                    document: selectedDoc.label,
+                    commune: user.commune,
+                    userId: user.id,
+                    files: uploadedFiles // Send actual File objects
+                  });
+                  setDemRef(res.id);
+                  setStep(3);
+                } catch (err) {
+                  alert("Erreur lors de la soumission");
+                } finally {
+                  setIsSubmitting(false);
+                }
               } else {
                 alert('Veuillez sélectionner une méthode de paiement.');
               }
             }}
-            className="btn-primary text-sm"
+            disabled={isSubmitting}
+            className={`btn-primary text-sm ${isSubmitting ? 'opacity-50' : ''}`}
           >
-            Confirmer et soumettre ma demande →
+            {isSubmitting ? 'Traitement...' : 'Confirmer et soumettre ma demande →'}
           </button>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 
 export default function CitoyenProfile() {
   const { user } = useAuth();
+  console.log("Profile User Data:", user);
   const initials = `${user.prenom[0]}${user.nom ? user.nom[0] : ''}`;
 
   return (
@@ -18,7 +19,7 @@ export default function CitoyenProfile() {
           </div>
           <div>
             <p className="font-heading font-bold text-idz-soot text-base">{user.nom || ''} {user.prenom}</p>
-            <p className="text-sm text-gray-400">{user.commune}, Algérie</p>
+            <p className="text-sm text-gray-400">{user.commune}</p>
           </div>
         </div>
 
@@ -26,9 +27,9 @@ export default function CitoyenProfile() {
         <div className="bg-gray-100 rounded-soft p-6 space-y-4">
           {[
             { label: 'Nom complet',              value: `${user.nom || ''} ${user.prenom}` },
-            { label: 'Date de naissance',        value: user.dateNaissance },
-            { label: 'Lieu de naissance',        value: user.lieuNaissance },
-            { label: 'NIN',                       value: '123456789123456789', mono: true },
+            { label: 'Date de naissance',        value: user.date_naissance || 'Non renseignée' },
+            { label: 'Lieu de naissance',        value: user.lieu_naissance || 'Non renseigné' },
+            { label: 'NIN',                       value: user.nin, mono: true },
             { label: 'Commune de résidence',      value: user.commune },
           ].map(({ label, value, mono }) => (
             <div key={label} className="flex items-start gap-4">

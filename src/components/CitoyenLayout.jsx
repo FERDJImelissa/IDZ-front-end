@@ -1,15 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FileText, PlusCircle, Bell, User, LogOut, Menu } from 'lucide-react';
+import { FileText, PlusCircle, Bell, User, LogOut, Menu, History } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 
 export default function CitoyenLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [notifCount, setNotifCount] = useState(0);
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const initials = `${user.prenom[0]}${user.nom ? user.nom[0] : ''}`;
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchCount = async () => {
+      try {
+        const data = await api.getNotifications(user.id);
+        setNotifCount(data.length);
+      } catch (e) {}
+    };
+    fetchCount();
+    const interval = setInterval(fetchCount, 5000); // Poll every 5s
+    return () => clearInterval(interval);
+  }, [user]);
 
   return (
     <div className="min-h-screen flex flex-col bg-idz-alabaster overflow-hidden">
@@ -76,8 +91,22 @@ export default function CitoyenLayout({ children }) {
               to="/citoyen/notifications"
               className={({ isActive }) => isActive ? 'sidebar-link-active' : 'sidebar-link'}
             >
-              <Bell size={16} />
+              <div className="relative">
+                <Bell size={16} />
+                {notifCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[8px] w-3.5 h-3.5 flex items-center justify-center rounded-full">
+                    {notifCount}
+                  </span>
+                )}
+              </div>
               {t('nav.notifications')}
+            </NavLink>
+            <NavLink
+              to="/citoyen/historique"
+              className={({ isActive }) => isActive ? 'sidebar-link-active' : 'sidebar-link'}
+            >
+              <History size={16} />
+              Historique
             </NavLink>
             <NavLink
               to="/citoyen/profil"

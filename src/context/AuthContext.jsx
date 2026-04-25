@@ -5,29 +5,23 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('idz_user');
-    return saved ? JSON.parse(saved) : { 
-      prenom: 'Citoyen', 
-      nom: 'DZ', 
-      type: 'citoyen',
-      commune: 'Alger-Centre',
-      dateNaissance: '01/01/1990',
-      lieuNaissance: 'Alger'
-    };
+    return saved ? JSON.parse(saved) : null;
   });
 
   const login = (userData) => {
-    const newUser = { ...user, ...userData };
-    setUser(newUser);
-    localStorage.setItem('idz_user', JSON.stringify(newUser));
+    setUser(userData);
+    localStorage.setItem('idz_user', JSON.stringify(userData));
   };
 
   const logout = () => {
     localStorage.removeItem('idz_user');
-    setUser({ prenom: 'Citoyen', nom: 'DZ', type: 'citoyen' });
+    setUser(null);
   };
 
+  const initials = user ? `${user.prenom[0]}${user.nom ? user.nom[0] : ''}` : '';
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, initials }}>
       {children}
     </AuthContext.Provider>
   );
